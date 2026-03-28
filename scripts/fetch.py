@@ -19,44 +19,35 @@ def fetch_vangelo():
     with urllib.request.urlopen(req, timeout=15) as response:
         raw = response.read().decode("utf-8")
 
-    match = re.search(r'var\s+speech\s*=\s*(\[.*?\]);', raw, re.DOTALL)
-    if not match:
-        raise ValueError("Array speech non trovato nel file JS")
+    data = json.loads(raw)
+    item = data["speech"][0]
 
-    data = json.loads(match.group(1))
-
-    lettura = ""
-    vangelo = ""
-    commento = ""
-
-    for item in data:
-        if item.get("letturaText"):
-            lettura = item["letturaText"]
-        if item.get("vangeloText"):
-            vangelo = item["vangeloText"]
-        if item.get("hfwText"):
-            commento = item["hfwText"]
+    lettura = item.get("letturaText", "")
+    vangelo = item.get("vangeloText", "")
+    commento = item.get("hfwText", "")
 
     return lettura, vangelo, commento, oggi
 
 def pulisci(testo):
-    testo = re.sub(r'<[^>]+>', ' ', testo)
-    testo = re.sub(r'\s+', ' ', testo)
+    testo = re.sub(r'<br\s*/?>', '\n', testo, flags=re.IGNORECASE)
+    testo = re.sub(r'<p[^>]*>', '\n', testo, flags=re.IGNORECASE)
+    testo = re.sub(r'</p>', '\n', testo, flags=re.IGNORECASE)
+    testo = re.sub(r'<[^>]+>', '', testo)
+    import html
+    testo = html.unescape(testo)
+    testo = re.sub(r'\n{3,}', '\n\n', testo)
     return testo.strip()
-
-def paragrafi(testo):
-    righe = ""
-    for frase in testo.split('. '):
-        frase = frase.strip()
-        if frase:
-            righe += f"<p>{frase}.</p>\n"
-    return righe
 
 def genera_html(lettura, vangelo, commento, oggi):
     data_str = oggi.strftime("%d/%m/%Y")
-    l = pulisci(lettura)
-    v = pulisci(vangelo)
-    c = pulisci(commento)
+
+    def a_paragrafi(testo):
+        righe = ""
+        for riga in testo.split('\n'):
+            riga = riga.strip()
+            if riga:
+                righe += f"<p>{riga}</p>\n"
+        return righe
 
     return f"""<!DOCTYPE html>
 <html lang="it">
@@ -68,17 +59,17 @@ def genera_html(lettura, vangelo, commento, oggi):
 <body>
 <h2>Vangelo del {data_str}</h2>
 <h3>Prima Lettura e Salmo</h3>
-{paragrafi(l)}
+{a_paragrafi(pulisci(lettura))}
 <h3>Vangelo</h3>
-{paragrafi(v)}
+{a_paragrafi(pulisci(vangelo))}
 <h3>Commento</h3>
-{paragrafi(c)}
+{a_paragrafi(pulisci(commento))}
 </body>
 </html>"""
 
 if __name__ == "__main__":
     lettura, vangelo, commento, oggi = fetch_vangelo()
-    html = genera_html(lettura, vangelo, commento, oggi)
+    html_content = genera_html(lettura, vangelo, commento, oggi)
     with open("index.html", "w", encoding="utf-8") as f:
-        f.write(html)
+        f.write(html_content)
     print(f"Generato: Vangelo del {oggi.strftime('%d/%m/%Y')}")

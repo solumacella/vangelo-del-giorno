@@ -91,6 +91,10 @@ def genera_rss(lettura, vangelo, commento, oggi):
 if __name__ == "__main__":
     lettura, vangelo, commento, oggi = fetch_vangelo()
     html_content = genera_html(lettura, vangelo, commento, oggi)
+    rss_content = genera_rss(lettura, vangelo, commento, oggi)
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_content)
+    with open("feed.xml", "w", encoding="utf-8") as f:
+        f.write(rss_content)
     print(f"Generato: Vangelo del {oggi.strftime('%d/%m/%Y')}")
+```

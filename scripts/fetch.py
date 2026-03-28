@@ -66,7 +66,28 @@ def genera_html(lettura, vangelo, commento, oggi):
 {a_paragrafi(pulisci(commento))}
 </body>
 </html>"""
+def genera_rss(lettura, vangelo, commento, oggi):
+    data_str = oggi.strftime("%d/%m/%Y")
+    data_rss = oggi.strftime("%a, %d %b %Y 06:00:00 +0100")
+    
+    contenuto = pulisci(lettura) + "\n\n" + pulisci(vangelo) + "\n\n" + pulisci(commento)
+    contenuto_escaped = contenuto.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Vangelo del Giorno</title>
+    <link>https://solumacella.github.io/vangelo-del-giorno/</link>
+    <description>Vangelo quotidiano da Vatican News</description>
+    <item>
+      <title>Vangelo del {data_str}</title>
+      <link>https://solumacella.github.io/vangelo-del-giorno/</link>
+      <guid>{oggi.strftime("%Y-%m-%d")}</guid>
+      <pubDate>{data_rss}</pubDate>
+      <description>{contenuto_escaped}</description>
+    </item>
+  </channel>
+</rss>"""
 if __name__ == "__main__":
     lettura, vangelo, commento, oggi = fetch_vangelo()
     html_content = genera_html(lettura, vangelo, commento, oggi)

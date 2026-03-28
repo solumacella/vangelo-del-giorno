@@ -1,6 +1,7 @@
 import urllib.request
 import json
 import re
+import html
 from datetime import datetime
 
 def fetch_vangelo():
@@ -9,23 +10,18 @@ def fetch_vangelo():
     mese = oggi.strftime("%m")
     giorno = oggi.strftime("%d")
     url = f"https://www.vaticannews.va/it/vangelo-del-giorno-e-parola-del-giorno/{anno}/{mese}/{giorno}.speech.js"
-
     req = urllib.request.Request(url, headers={
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         "Accept": "*/*",
         "Referer": "https://www.vaticannews.va/"
     })
-
     with urllib.request.urlopen(req, timeout=15) as response:
         raw = response.read().decode("utf-8")
-
     data = json.loads(raw)
     item = data["speech"][0]
-
     lettura = item.get("letturaText", "")
     vangelo = item.get("vangeloText", "")
     commento = item.get("hfwText", "")
-
     return lettura, vangelo, commento, oggi
 
 def pulisci(testo):
@@ -33,22 +29,20 @@ def pulisci(testo):
     testo = re.sub(r'<p[^>]*>', '\n', testo, flags=re.IGNORECASE)
     testo = re.sub(r'</p>', '\n', testo, flags=re.IGNORECASE)
     testo = re.sub(r'<[^>]+>', '', testo)
-    import html
     testo = html.unescape(testo)
     testo = re.sub(r'\n{3,}', '\n\n', testo)
     return testo.strip()
 
+def a_paragrafi(testo):
+    righe = ""
+    for riga in testo.split('\n'):
+        riga = riga.strip()
+        if riga:
+            righe += f"<p>{riga}</p>\n"
+    return righe
+
 def genera_html(lettura, vangelo, commento, oggi):
     data_str = oggi.strftime("%d/%m/%Y")
-
-    def a_paragrafi(testo):
-        righe = ""
-        for riga in testo.split('\n'):
-            riga = riga.strip()
-            if riga:
-                righe += f"<p>{riga}</p>\n"
-        return righe
-
     return f"""<!DOCTYPE html>
 <html lang="it">
 <head>
@@ -66,13 +60,12 @@ def genera_html(lettura, vangelo, commento, oggi):
 {a_paragrafi(pulisci(commento))}
 </body>
 </html>"""
+
 def genera_rss(lettura, vangelo, commento, oggi):
     data_str = oggi.strftime("%d/%m/%Y")
     data_rss = oggi.strftime("%a, %d %b %Y 06:00:00 +0100")
-    
     contenuto = pulisci(lettura) + "\n\n" + pulisci(vangelo) + "\n\n" + pulisci(commento)
     contenuto_escaped = contenuto.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
@@ -88,6 +81,7 @@ def genera_rss(lettura, vangelo, commento, oggi):
     </item>
   </channel>
 </rss>"""
+
 if __name__ == "__main__":
     lettura, vangelo, commento, oggi = fetch_vangelo()
     html_content = genera_html(lettura, vangelo, commento, oggi)
@@ -97,4 +91,3 @@ if __name__ == "__main__":
     with open("feed.xml", "w", encoding="utf-8") as f:
         f.write(rss_content)
     print(f"Generato: Vangelo del {oggi.strftime('%d/%m/%Y')}")
-```

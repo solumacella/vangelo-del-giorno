@@ -38,7 +38,7 @@ def a_paragrafi(testo):
     for riga in testo.split('\n'):
         riga = riga.strip()
         if riga:
-            righe += f"<p>{riga}</p>\n"
+            righe += f"{riga}<br><br>\n"
     return righe
 
 def genera_html(lettura, vangelo, commento, oggi):
@@ -51,12 +51,12 @@ def genera_html(lettura, vangelo, commento, oggi):
 <title>Vangelo del {data_str}</title>
 </head>
 <body>
-<h2>Vangelo del {data_str}</h2>
-<h3>Prima Lettura e Salmo</h3>
+<b>Vangelo del {data_str}</b><br><br>
+<b>Prima Lettura e Salmo</b><br><br>
 {a_paragrafi(pulisci(lettura))}
-<h3>Vangelo</h3>
+<b>Vangelo</b><br><br>
 {a_paragrafi(pulisci(vangelo))}
-<h3>Commento</h3>
+<b>Commento</b><br><br>
 {a_paragrafi(pulisci(commento))}
 </body>
 </html>"""

@@ -68,13 +68,13 @@ def genera_rss(lettura, vangelo, commento, oggi):
     contenuto_escaped = contenuto.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
-  <channel>
+ <channel>
     <title>Vangelo del Giorno</title>
     <link>https://solumacella.github.io/vangelo-del-giorno/</link>
     <description>Vangelo quotidiano da Vatican News</description>
     <item>
       <title>Vangelo del {data_str}</title>
-      <link>https://solumacella.github.io/vangelo-del-giorno/</link>
+      <link>https://solumacella.github.io/vangelo-del-giorno/?data={oggi.strftime("%Y-%m-%d")}</link>
       <guid>{oggi.strftime("%Y-%m-%d")}</guid>
       <pubDate>{data_rss}</pubDate>
       <description>{contenuto_escaped}</description>

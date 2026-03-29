@@ -23,7 +23,7 @@ jobs:
       - name: Fetch e genera HTML
         run: python3 scripts/fetch.py
 
-    - name: Commit index.html
+      - name: Commit index.html
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
- <channel>
+  <channel>
     <title>Vangelo del Giorno</title>
     <link>https://solumacella.github.io/vangelo-del-giorno/</link>
     <description>Vangelo quotidiano da Vatican News</description>
     <item>
       <title>Vangelo del 30/03/2026</title>
-      <link>https://solumacella.github.io/vangelo-del-giorno/?data=2026-03-30</link>
-      <guid>2026-03-30</guid>
+      <link>https://solumacella.github.io/vangelo-del-giorno/2026/03/30.html</link>
+      <guid>https://solumacella.github.io/vangelo-del-giorno/2026/03/30.html</guid>
       <pubDate>Mon, 30 Mar 2026 06:00:00 +0100</pubDate>
       <description>Prima Lettura
  

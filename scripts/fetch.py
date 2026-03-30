@@ -64,18 +64,22 @@ def genera_html(lettura, vangelo, commento, oggi):
 def genera_rss(lettura, vangelo, commento, oggi):
     data_str = oggi.strftime("%d/%m/%Y")
     data_rss = oggi.strftime("%a, %d %b %Y 06:00:00 +0100")
+    anno = oggi.strftime("%Y")
+    mese = oggi.strftime("%m")
+    giorno = oggi.strftime("%d")
+    url_oggi = f"https://solumacella.github.io/vangelo-del-giorno/{anno}/{mese}/{giorno}.html"
     contenuto = pulisci(lettura) + "\n\n" + pulisci(vangelo) + "\n\n" + pulisci(commento)
     contenuto_escaped = contenuto.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
- <channel>
+  <channel>
     <title>Vangelo del Giorno</title>
     <link>https://solumacella.github.io/vangelo-del-giorno/</link>
     <description>Vangelo quotidiano da Vatican News</description>
     <item>
       <title>Vangelo del {data_str}</title>
-      <link>https://solumacella.github.io/vangelo-del-giorno/?data={oggi.strftime("%Y-%m-%d")}</link>
-      <guid>{oggi.strftime("%Y-%m-%d")}</guid>
+      <link>{url_oggi}</link>
+      <guid>{url_oggi}</guid>
       <pubDate>{data_rss}</pubDate>
       <description>{contenuto_escaped}</description>
     </item>
@@ -84,8 +88,15 @@ def genera_rss(lettura, vangelo, commento, oggi):
 
 if __name__ == "__main__":
     lettura, vangelo, commento, oggi = fetch_vangelo()
+    anno = oggi.strftime("%Y")
+    mese = oggi.strftime("%m")
+    giorno = oggi.strftime("%d")
     html_content = genera_html(lettura, vangelo, commento, oggi)
     rss_content = genera_rss(lettura, vangelo, commento, oggi)
+    import os
+    os.makedirs(f"{anno}/{mese}", exist_ok=True)
+    with open(f"{anno}/{mese}/{giorno}.html", "w", encoding="utf-8") as f:
+        f.write(html_content)
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_content)
     with open("feed.xml", "w", encoding="utf-8") as f:

@@ -2,7 +2,7 @@ name: Fetch Vangelo del Giorno
 
 on:
   schedule:
-    - cron: '0 5 * * *'
+    - cron: '0 3 * * *'
   workflow_dispatch:
   push:
     branches:
